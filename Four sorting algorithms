@@ -1,1 +1,122 @@
 四种排序算法
+1.Bubble Algrorithm
+1.冒泡算法
+//原理：将数组中的值从第一个开始一一比较，每次比较确定一个最大值，放在比较范围内的最后，比较范围逐渐缩小。
+function bubble(&$arr)
+{
+	$len = count($arr);
+	//设置标识
+	$flag = 0;
+	//外层循环，没循环一次确定一个相对最大值
+	for($i=0;$i<$len-1;$i++)
+	{
+	//内层循环
+		for($j=0;$j<$len-$i-1;$j++)
+		{
+			if($arr[$j]>$arr[$j+1])
+			{
+				$temp = $arr[$j];
+				$arr[$j] = $arr[$j+1];
+				$arr[$j+1] = $temp;
+				$flag = 1;
+			}
+		}
+		//可以做一下优化
+		if($flag == 0)
+		{
+			break;
+		}
+		else
+		{
+		//用于下一次判断
+			$flag = 1;
+		}
+	}
+}
+
+2.插入排序
+//原理：将第一个数，和后面的数，作为两个数组，将后面的数逐步插入前面的数组，通过设置一个指针进行比较，如果大于，则放在指针后，小于，将指针的值向后移。
+function insert(&$arr)
+{
+    $len = count($arr);
+    //从第二个开始插入
+    for($i=1;$i<$len;$i++)
+    {
+        $insertVal = $arr[$i];
+        //设置插入的值开始比较的位置，即初始化指针
+        $index = $i-1;
+        while($index>=0&&($insertVal<$arr[$index]))
+        {
+            //将指针所在位置数向后移一位
+            $arr[$index+1] = $arr[$index];
+            $index--;
+        }
+        //如果条件不符，即插入值比指针所指位置值大，将值插入指针所在位置之后
+        $arr[$index+1] = $insertVal;
+    }
+
+}
+
+3.选择排序
+//默认设定第一个为最小值，然后从数组中比较选出一个最小值，放在设定的位置
+
+function select(&$arr)
+{
+	$len = count($arr)
+	//循环
+	for($i=0;$i<$len-1;$i++)
+	{
+		//设置最小值和下标
+		$min = $arr[$i];
+		$min_in  = $i;
+		//从$i下一位开始比较，找到最小值,从$i位一直比较到最后
+		for($j=$i+1;$j<$len;$j++)
+		{
+		//判断如果小，则交换
+			if($arr[$j]<$min)
+			{
+				$min = $arr[$j];
+				$min_in = $j; 
+			}
+			//判断如果$i和最小值不是一个交换
+			if($min_in!=$i)
+			{
+				$arr[$min_in] = $arr[$i];
+				$arr[$i] = $min;
+			}
+		}	
+	}
+}
+
+4.快速排序
+//即设置一个标准，将数组以标准分为两组，以此类推
+
+function quick($arr)
+{
+	$len = count($arr);
+	//如果只有一个数，返回数组
+	if($len<=1)
+	{
+		return $arr;
+	}
+	//设定标准及左右两个数组
+	$base = $arr[0]
+	$left = $right =[];
+	
+	for($i = 1;$i<$len;$i++)
+	{
+		if($arr[$i]<$base)
+		{
+			$left[] = $arr[$i];
+		}
+		else
+		{
+			$right[] = $arr[$i];
+		}
+	}
+	//递归调用函数
+	$left = quick($left);
+	$right = quick($right);
+	//返回值
+	return array_merage($left,array($base),$right);
+}
