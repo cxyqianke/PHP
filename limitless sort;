@@ -1,0 +1,92 @@
+无限分类
+
+//获取树形结构
+function gettree()
+{
+	//连接数据库
+	$link = mysqli_connect('localhost','root','','pet');
+	//设置字符集
+	mysqli_query($link,'SET NAMES UTF8;');
+	//SQL语句
+	$sql = "SELECT * FROM cat;";
+	//执行语句
+	$res = mysqli_query($link,$sql);
+	//接收数据
+	$rows = array();
+	while($row = mysqli_fetch_array($res))
+	{
+		$rows[] = $row;
+	};
+	//默认顶级
+	return tree($rows,$id=0);
+}
+/**
+ * [tree 辨别栏目上下级关系]
+ * @param  integer  $rows   数据
+ * @param  integer  $id     id
+ * @param  integer $level 	栏目级别
+ * @return 树状结构数组
+ */
+function tree($rows,$id,$level = 0)
+{
+  //设置静态变量存储级别
+	static $tree = array();
+	//变成一维
+	foreach($rows as $v)
+	{
+		//判断栏目所属级别一致
+		if($v['p_id'] == $id)
+		{
+			$v['level'] = $level;
+			$tree[] = $v;
+			//下一级,将$rows传入，判断级别为 此级+1的
+		    tree($rows,$v['id'],$level+1);
+		}
+
+	}
+	return $tree;
+
+}
+$rows = gettree();
+
+//总结思路，即在数据库中取得所有数据，第一轮循环，传入数据，将id和level都设置为1，然后递归调用，将以后的级别依次比较出来，形成树形的无限级。
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>添加栏目</title>
+</head>
+<body>
+	<form action="" method="post">
+		<input type="text" name="cat_name">
+		<select name="p_id">
+			<option value="0">顶级栏目</option>
+			<?php foreach($rows as $v):?>
+			<option value="<?php echo $v['id'];?>">
+      //str_repeat 表示输出level个-，可以形成视觉无限极
+			<?php echo str_repeat("-",$v['level']); echo $v['name'];?></option>
+			<?php endforeach;?>
+		<select>
+		<input type="hidden" name="hid" value="1">
+		<input type="submit" value="添加" />
+	</form>
+</body>
+</html>
+<?php
+//添加数据
+//接收
+if(isset($_POST['hid']))
+{
+	$name = $_POST['cat_name'];
+	$p_id = $_POST['p_id'];
+//插入语句
+	$i_sql = "INSERT INTO cat(name,p_id) VALUES('{$name}',{$p_id});";
+//执行语句
+	$i_res = mysqli_query($link,$i_sql);
+	if($i_res)
+	{
+		echo"<script>alert('添加成功！');</script>";
+	} 
+}
+
+?>
